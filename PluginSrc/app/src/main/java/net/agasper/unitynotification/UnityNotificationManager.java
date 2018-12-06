@@ -13,15 +13,14 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioAttributes;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
 
 import com.unity3d.player.UnityPlayer;
 
@@ -29,8 +28,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class UnityNotificationManager extends BroadcastReceiver
-{
+public class UnityNotificationManager extends BroadcastReceiver {
     private static Set<String> channels = new HashSet<>();
 
     public static void CreateChannel(String identifier, String name, String description, int importance, String soundName, int enableLights, int lightColor, int enableVibration, long[] vibrationPattern, String bundle) {
@@ -52,7 +50,7 @@ public class UnityNotificationManager extends BroadcastReceiver
         channel.setLightColor(lightColor);
         channel.enableVibration(enableVibration == 1);
         if (vibrationPattern == null)
-            vibrationPattern = new long[] { 1000L, 1000L };
+            vibrationPattern = new long[]{1000L, 1000L};
         channel.setVibrationPattern(vibrationPattern);
         nm.createNotificationChannel(channel);
     }
@@ -68,8 +66,7 @@ public class UnityNotificationManager extends BroadcastReceiver
 
     public static void SetNotification(int id, long delayMs, String title, String message, String ticker, int sound, String soundName, int vibrate,
                                        int lights, String largeIconResource, String smallIconResource, int bgColor, String bundle, String channel,
-                                       ArrayList<NotificationAction> actions)
-    {
+                                       ArrayList<NotificationAction> actions) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (channel == null)
                 channel = "default";
@@ -77,7 +74,7 @@ public class UnityNotificationManager extends BroadcastReceiver
         }
 
         Activity currentActivity = UnityPlayer.currentActivity;
-        AlarmManager am = (AlarmManager)currentActivity.getSystemService(Context.ALARM_SERVICE);
+        AlarmManager am = (AlarmManager) currentActivity.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(currentActivity, UnityNotificationManager.class);
         intent.putExtra("ticker", ticker);
         intent.putExtra("title", title);
@@ -102,8 +99,7 @@ public class UnityNotificationManager extends BroadcastReceiver
     }
 
     public static void SetRepeatingNotification(int id, long delayMs, String title, String message, String ticker, long rep, int sound, String soundName, int vibrate, int lights,
-                                                String largeIconResource, String smallIconResource, int bgColor, String bundle, String channel, ArrayList<NotificationAction> actions)
-    {
+                                                String largeIconResource, String smallIconResource, int bgColor, String bundle, String channel, ArrayList<NotificationAction> actions) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (channel == null)
                 channel = "default";
@@ -111,7 +107,7 @@ public class UnityNotificationManager extends BroadcastReceiver
         }
 
         Activity currentActivity = UnityPlayer.currentActivity;
-        AlarmManager am = (AlarmManager)currentActivity.getSystemService(Context.ALARM_SERVICE);
+        AlarmManager am = (AlarmManager) currentActivity.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(currentActivity, UnityNotificationManager.class);
         intent.putExtra("ticker", ticker);
         intent.putExtra("title", title);
@@ -132,9 +128,8 @@ public class UnityNotificationManager extends BroadcastReceiver
         am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayMs, rep, PendingIntent.getBroadcast(currentActivity, id, intent, PendingIntent.FLAG_UPDATE_CURRENT));
     }
 
-    public void onReceive(Context context, Intent intent)
-    {
-        NotificationManager notificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+    public void onReceive(Context context, Intent intent) {
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         String ticker = intent.getStringExtra("ticker");
         String title = intent.getStringExtra("title");
@@ -196,7 +191,7 @@ public class UnityNotificationManager extends BroadcastReceiver
         }
 
         if (vibrate)
-            builder.setVibrate(new long[] {
+            builder.setVibrate(new long[]{
                     1000L, 1000L
             });
 
@@ -214,7 +209,11 @@ public class UnityNotificationManager extends BroadcastReceiver
         }
 
         Notification notification = builder.build();
-        notificationManager.notify(id, notification);
+        try {
+            notificationManager.notify(id, notification);
+        } catch (IllegalArgumentException e) {
+            Log.e("Agasper", e.getMessage());
+        }
     }
 
     private static PendingIntent buildActionIntent(NotificationAction action, int id) {
@@ -228,19 +227,17 @@ public class UnityNotificationManager extends BroadcastReceiver
         return PendingIntent.getBroadcast(currentActivity, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    public static void CancelPendingNotification(int id)
-    {
+    public static void CancelPendingNotification(int id) {
         Activity currentActivity = UnityPlayer.currentActivity;
-        AlarmManager am = (AlarmManager)currentActivity.getSystemService(Context.ALARM_SERVICE);
+        AlarmManager am = (AlarmManager) currentActivity.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(currentActivity, UnityNotificationManager.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(currentActivity, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         am.cancel(pendingIntent);
     }
 
-    public static void ClearShowingNotifications()
-    {
+    public static void ClearShowingNotifications() {
         Activity currentActivity = UnityPlayer.currentActivity;
-        NotificationManager nm = (NotificationManager)currentActivity.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager nm = (NotificationManager) currentActivity.getSystemService(Context.NOTIFICATION_SERVICE);
         nm.cancelAll();
     }
 }
