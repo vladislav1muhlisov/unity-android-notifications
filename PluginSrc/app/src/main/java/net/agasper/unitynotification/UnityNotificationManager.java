@@ -20,7 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.util.Log;
+import com.geargames.aow.logger.NativeLogger;
 
 import com.unity3d.player.UnityPlayer;
 
@@ -96,6 +96,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             am.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayMs, PendingIntent.getBroadcast(currentActivity, id, intent, PendingIntent.FLAG_UPDATE_CURRENT));
         else
             am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayMs, PendingIntent.getBroadcast(currentActivity, id, intent, PendingIntent.FLAG_UPDATE_CURRENT));
+        NativeLogger.Log("SetNotification: id=" + id + ", Title=" + title + ", Message=" + message);
     }
 
     public static void SetRepeatingNotification(int id, long delayMs, String title, String message, String ticker, long rep, int sound, String soundName, int vibrate, int lights,
@@ -126,6 +127,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         b.putParcelableArrayList("actions", actions);
         intent.putExtra("actionsBundle", b);
         am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayMs, rep, PendingIntent.getBroadcast(currentActivity, id, intent, PendingIntent.FLAG_UPDATE_CURRENT));
+        NativeLogger.Log("SetRepeatingNotification: id=" + id + ", Title=" + title + ", Message=" + message);
     }
 
     public void onReceive(Context context, Intent intent) {
@@ -212,7 +214,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         try {
             notificationManager.notify(id, notification);
         } catch (IllegalArgumentException e) {
-            Log.e("Agasper", e.getMessage());
+            NativeLogger.Error("onReceive: IllegalArgumentException: " + e.getMessage());
         }
     }
 
