@@ -13,17 +13,15 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioAttributes;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import com.geargames.aow.logger.NativeLogger;
 
+import com.geargames.aow.logger.NativeLogger;
 import com.unity3d.player.UnityPlayer;
 
 import java.util.ArrayList;
@@ -52,7 +50,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         channel.setLightColor(lightColor);
         channel.enableVibration(enableVibration == 1);
         if (vibrationPattern == null)
-            vibrationPattern = new long[] { 1000L, 1000L };
+            vibrationPattern = new long[]{1000L, 1000L};
         channel.setVibrationPattern(vibrationPattern);
         nm.createNotificationChannel(channel);
     }
@@ -68,8 +66,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     public static void SetNotification(int id, long delayMs, String title, String message, String ticker, int sound, String soundName, int vibrate,
                                        int lights, String largeIconResource, String smallIconResource, int bgColor, String bundle, String channel, NotificationAction clickAction,
-                                       ArrayList<NotificationAction> actions)
-    {
+                                       ArrayList<NotificationAction> actions) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (channel == null)
                 channel = "default";
@@ -77,7 +74,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
 
         Activity currentActivity = UnityPlayer.currentActivity;
-        AlarmManager am = (AlarmManager)currentActivity.getSystemService(Context.ALARM_SERVICE);
+        AlarmManager am = (AlarmManager) currentActivity.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(currentActivity, UnityNotificationManager.class);
         intent.putExtra("ticker", ticker);
         intent.putExtra("title", title);
@@ -104,8 +101,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     public static void SetRepeatingNotification(int id, long delayMs, String title, String message, String ticker, long rep, int sound, String soundName, int vibrate, int lights,
-                                                String largeIconResource, String smallIconResource, int bgColor, String bundle, String channel, NotificationAction clickAction, ArrayList<NotificationAction> actions)
-    {
+                                                String largeIconResource, String smallIconResource, int bgColor, String bundle, String channel, NotificationAction clickAction, ArrayList<NotificationAction> actions) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (channel == null)
                 channel = "default";
@@ -113,7 +109,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
 
         Activity currentActivity = UnityPlayer.currentActivity;
-        AlarmManager am = (AlarmManager)currentActivity.getSystemService(Context.ALARM_SERVICE);
+        AlarmManager am = (AlarmManager) currentActivity.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(currentActivity, UnityNotificationManager.class);
         intent.putExtra("ticker", ticker);
         intent.putExtra("title", title);
@@ -201,7 +197,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
 
         if (vibrate)
-            builder.setVibrate(new long[] {
+            builder.setVibrate(new long[]{
                     1000L, 1000L
             });
 
@@ -230,7 +226,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
     }
 
-    private static PendingIntent buildActionIntent(NotificationAction action, int id,Context context) {
+    private static PendingIntent buildActionIntent(NotificationAction action, int id, Context context) {
         Intent intent = new Intent(context, UnityNotificationActionHandler.class);
         intent.putExtra("id", id);
         intent.putExtra("gameObject", action.getGameObject());
