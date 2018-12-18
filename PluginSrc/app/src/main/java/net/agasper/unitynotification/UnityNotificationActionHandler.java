@@ -13,6 +13,9 @@ import com.unity3d.player.UnityPlayerActivity;
  */
 
 public class UnityNotificationActionHandler extends BroadcastReceiver {
+
+    private final String ACTION_NOTIFICATION_MESSAGE = "ACTION_NOTIFICATION_MESSAGE";
+
     @Override
     public void onReceive(Context context, Intent intent) {
         int id = intent.getIntExtra("id", 0);
@@ -25,9 +28,12 @@ public class UnityNotificationActionHandler extends BroadcastReceiver {
         notificationManager.cancel(id);
 
         if (foreground) {
-            Intent launchIntent = new Intent(context, UnityPlayerActivity.class);
-            launchIntent.setPackage(null);
-            launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage("com.geargames.aow");
+            launchIntent.setAction(ACTION_NOTIFICATION_MESSAGE);
+            launchIntent.putExtra("id", id);
+            launchIntent.putExtra("gameObject", gameObject);
+            launchIntent.putExtra("handlerMethod", handlerMethod);
+            launchIntent.putExtra("actionId", actionId);
             context.startActivity(launchIntent);
         }
 
