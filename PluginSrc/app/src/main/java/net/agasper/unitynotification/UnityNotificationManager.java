@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import com.geargames.aow.logger.NativeLogger;
 
 import com.unity3d.player.UnityPlayer;
 
@@ -29,8 +30,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class UnityNotificationManager extends BroadcastReceiver
-{
+public class UnityNotificationManager extends BroadcastReceiver {
     private static Set<String> channels = new HashSet<>();
 
     public static void CreateChannel(String identifier, String name, String description, int importance, String soundName, int enableLights, int lightColor, int enableVibration, long[] vibrationPattern, String bundle) {
@@ -100,6 +100,7 @@ public class UnityNotificationManager extends BroadcastReceiver
             am.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayMs, PendingIntent.getBroadcast(currentActivity, id, intent, PendingIntent.FLAG_UPDATE_CURRENT));
         else
             am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayMs, PendingIntent.getBroadcast(currentActivity, id, intent, PendingIntent.FLAG_UPDATE_CURRENT));
+        NativeLogger.Log("SetNotification: id=" + id + ", Title=" + title + ", Message=" + message);
     }
 
     public static void SetRepeatingNotification(int id, long delayMs, String title, String message, String ticker, long rep, int sound, String soundName, int vibrate, int lights,
@@ -132,11 +133,11 @@ public class UnityNotificationManager extends BroadcastReceiver
         b.putParcelableArrayList("actions", actions);
         intent.putExtra("actionsBundle", b);
         am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayMs, rep, PendingIntent.getBroadcast(currentActivity, id, intent, PendingIntent.FLAG_UPDATE_CURRENT));
+        NativeLogger.Log("SetRepeatingNotification: id=" + id + ", Title=" + title + ", Message=" + message);
     }
 
-    public void onReceive(Context context, Intent intent)
-    {
-        NotificationManager notificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+    public void onReceive(Context context, Intent intent) {
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         String ticker = intent.getStringExtra("ticker");
         String title = intent.getStringExtra("title");
@@ -222,7 +223,11 @@ public class UnityNotificationManager extends BroadcastReceiver
         }
 
         Notification notification = builder.build();
-        notificationManager.notify(id, notification);
+        try {
+            notificationManager.notify(id, notification);
+        } catch (IllegalArgumentException e) {
+            NativeLogger.Error("onReceive: IllegalArgumentException: " + e.getMessage());
+        }
     }
 
     private static PendingIntent buildActionIntent(NotificationAction action, int id,Context context) {
@@ -235,19 +240,17 @@ public class UnityNotificationManager extends BroadcastReceiver
         return PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    public static void CancelPendingNotification(int id)
-    {
+    public static void CancelPendingNotification(int id) {
         Activity currentActivity = UnityPlayer.currentActivity;
-        AlarmManager am = (AlarmManager)currentActivity.getSystemService(Context.ALARM_SERVICE);
+        AlarmManager am = (AlarmManager) currentActivity.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(currentActivity, UnityNotificationManager.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(currentActivity, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         am.cancel(pendingIntent);
     }
 
-    public static void ClearShowingNotifications()
-    {
+    public static void ClearShowingNotifications() {
         Activity currentActivity = UnityPlayer.currentActivity;
-        NotificationManager nm = (NotificationManager)currentActivity.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager nm = (NotificationManager) currentActivity.getSystemService(Context.NOTIFICATION_SERVICE);
         nm.cancelAll();
     }
 }
