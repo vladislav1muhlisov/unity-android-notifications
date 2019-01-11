@@ -16,6 +16,7 @@ public class NotificationAction implements Parcelable {
     private boolean foreground;
     private String gameObject;
     private String handlerMethod;
+    private String json;
 
     public String getIdentifier() {
         return identifier;
@@ -55,6 +56,9 @@ public class NotificationAction implements Parcelable {
         this.handlerMethod = handlerMethod;
     }
 
+    public String getJson() { return json; }
+    public void setJson(String json) { this.json = json;}
+
     @Override
     public int describeContents() {
         return 0;
@@ -68,6 +72,7 @@ public class NotificationAction implements Parcelable {
         dest.writeInt(isForeground() ? 1 : 0);
         dest.writeString(getGameObject());
         dest.writeString(getHandlerMethod());
+        dest.writeString(getJson());
     }
 
     private static class Creator implements Parcelable.Creator<NotificationAction> {
@@ -81,6 +86,7 @@ public class NotificationAction implements Parcelable {
             action.setForeground(source.readInt() == 1);
             action.setGameObject(source.readString());
             action.setHandlerMethod(source.readString());
+            action.setJson(source.readString());
             return action;
         }
 

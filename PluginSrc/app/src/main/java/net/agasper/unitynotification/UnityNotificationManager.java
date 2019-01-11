@@ -233,6 +233,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         intent.putExtra("handlerMethod", action.getHandlerMethod());
         intent.putExtra("actionId", action.getIdentifier());
         intent.putExtra("foreground", action.isForeground());
+        intent.putExtra("json", action.getJson());
         return PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 

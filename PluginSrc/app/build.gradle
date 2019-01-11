@@ -41,7 +41,7 @@ task deleteOldJar(type: Delete) {
 }
 
 task exportJar(type: Copy) {
-    from('build/intermediates/bundles/release/classes.jar')
+    from('build/intermediates/intermediate-jars/release/classes.jar')
     into('release/')
     rename('classes.jar', 'notification.jar')
 }
